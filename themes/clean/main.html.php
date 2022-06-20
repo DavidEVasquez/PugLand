@@ -1,0 +1,65 @@
+<?php if (!defined('HTMLY')) die('HTMLy'); ?>
+<?php if (!empty($breadcrumb)): ?>
+    <div class="breadcrumb"><?php echo $breadcrumb ?></div>
+<?php endif; ?>
+<?php if (config('category.info') === 'true'):?>
+    <?php if (!empty($category)): ?>
+        <div class="category">
+            <h2 class="category-title"><?php echo $category->title;?></h2>
+            <div class="category-content">                                   
+                <?php echo $category->body; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
+<?php $i = 0; $len = count($posts); ?>
+<?php foreach ($posts as $p): ?>
+    <?php if ($i == 0) {
+        $class = 'post first';
+    } elseif ($i == $len - 1) {
+        $class = 'post last';
+    } else {
+        $class = 'post';
+    }
+    $i++; ?>
+    <div class="<?php echo $class ?>" itemprop="blogPost" itemscope="itemscope" itemtype="http://schema.org/BlogPosting">
+        <div class="main">
+            <?php if (!empty($p->link)) { ?>
+                <h2 class="title-index" itemprop="name"><a href="<?php echo $p->link ?>"><?php echo $p->title ?> &rarr;</a></h2>
+            <?php } else { ?>
+                <h2 class="title-index" itemprop="name"><a href="<?php echo $p->url ?>"><?php echo $p->title ?></a></h2>
+            <?php } ?>
+            <div class="date">
+                <span itemprop="datePublished"><?php echo format_date($p->date) ?></span> - Posted in
+                <span itemprop="articleSection"><?php echo $p->category ?></span>
+				<?php if (login()) { echo ' - <span><a href="'. $p->url .'/edit?destination=post">Edit</a></span>'; } ?>
+            </div>
+            <?php if (!empty($p->image)) { ?>
+                <div class="featured-image">
+                    <a href="<?php echo $p->url ?>"><img src="<?php echo $p->image; ?>" alt="<?php echo $p->title ?>"/></a>
+                </div>
+            <?php } ?>
+            <?php if (!empty($p->quote)) { ?>
+                <div class="featured-quote">
+                    <blockquote><?php echo $p->quote ?></blockquote>
+                </div>
+            <?php } ?>
+            <div class="teaser-body" itemprop="articleBody">
+                <?php echo get_thumbnail($p->body) ?>
+                <?php echo get_teaser($p->body, $p->url) ?>
+                <?php if (config('teaser.type') === 'trimmed'):?><a href="<?php echo $p->url;?>"><?php echo config('read.more'); ?></a><?php endif;?>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
+<?php if (!empty($pagination['prev']) || !empty($pagination['next'])): ?>
+    <div class="pager">
+        <?php if (!empty($pagination['prev'])): ?>
+            <span><a href="?page=<?php echo $page - 1 ?>" class="pagination-arrow newer" rel="prev">Newer</a></span>
+        <?php endif; ?>
+         <span class="page-number"><?php echo $pagination['pagenum']; ?></span>
+        <?php if (!empty($pagination['next'])): ?>
+            <span><a href="?page=<?php echo $page + 1 ?>" class="pagination-arrow older" rel="next">Older</a></span>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
